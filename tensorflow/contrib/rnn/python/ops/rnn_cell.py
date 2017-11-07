@@ -1246,12 +1246,36 @@ class HighwayWrapper(rnn_cell_impl.RNNCell):
 
 
 class LayerNormBasicGRUCell(rnn_cell_impl.RNNCell):
+    """GRU unit with layer normalization.
+
+      This class adds layer normalization to a
+      basic GRU unit. Layer normalization implementation is based on:
+
+        https://arxiv.org/abs/1607.06450.
+
+      "Layer Normalization"
+      Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E. Hinton
+
+      and is applied before the internal nonlinearities.
+      """
+
     def __init__(self, num_units,
                  activation=math_ops.tanh,
                  layer_norm=True,
                  norm_gain=1.0,
                  norm_shift=0.0,
                  reuse=None):
+        """Initializes the basic LSTM cell.
+
+            Args:
+              num_units: int, The number of units in the GRU cell.
+              activation: Activation function of the inner states.
+              layer_norm: If `True`, layer normalization will be applied.
+              norm_gain: float, The layer normalization gain initial value. If
+                `layer_norm` has been set to `False`, this argument will be ignored.
+              norm_shift: float, The layer normalization shift initial value. If
+                `layer_norm` has been set to `False`, this argument will be ignored.
+            """
 
         super(LayerNormBasicGRUCell, self).__init__(_reuse=reuse)
 
