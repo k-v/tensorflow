@@ -1318,8 +1318,9 @@ class LayerNormBasicGRUCell(rnn_cell_impl.RNNCell):
 
     def call(self, inputs, state):
         """GRU cell with layer normalization."""
+        h, _ = state
+        args = array_ops.concat([inputs, h], 1)
 
-        args = array_ops.concat([inputs, state], 1)
         z = self._linear(args, scope="update")
         r = self._linear(args, scope="reset")
 
@@ -1330,16 +1331,16 @@ class LayerNormBasicGRUCell(rnn_cell_impl.RNNCell):
         z = math_ops.sigmoid(z)
         r = math_ops.sigmoid(r)
 
-        _x = self._linear(args, scope="candidate_input")
-        _h = self._linear(args, scope="candidate_state")
+        _x = self._linear(inputs, scope="candidate_linear_x")
+        _h = self._linear(h, scope="candidate_linear_h")
 
         if self._layer_norm:
-            _x = self._norm(_x, scope="candidate_input")
-            _h = self._norm(_h, scope="candidate_state")
+            _x = self._norm(_x, scope="candidate_linear_x")
+            _h = self._norm(_h, scope="candidate_linear_h")
 
         candidate = self._activation(_x + r * _h)
 
-        new_h = (1 - z) * state + z * candidate
+        new_h = (1 - z) * h + z * candidate
 
         return new_h, new_h
 
